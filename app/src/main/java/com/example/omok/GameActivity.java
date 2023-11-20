@@ -170,7 +170,7 @@ public class GameActivity extends AppCompatActivity {
         }
 
     }
-
+    
     private void checkWinner() {
 
     }
@@ -197,10 +197,8 @@ public class GameActivity extends AppCompatActivity {
             Log.d("RotateState", row.toString());
         }
         Log.d("RotateState", "=====================");
+
     }
-
-
-
 }
 
 
