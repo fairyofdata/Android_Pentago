@@ -14,16 +14,20 @@ import java.util.Arrays;
 
 public class pentagoAdapter extends BaseAdapter {
     private Context mContext;
-    private GridView mGridView;
-    private int[] stones;
+
+    private int[][] stones;
 
 
 
-    public pentagoAdapter(Context c, GridView gridView) {
+    public pentagoAdapter(Context c) {
         mContext = c;
-        mGridView = gridView;
-        stones = new int[getCount()];
-        Arrays.fill(stones, Color.GRAY);
+
+        stones = new int[6][6];
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 6; j++) {
+                stones[i][j] = Color.GRAY;
+            }
+        }
 
 
     }
@@ -53,23 +57,14 @@ public class pentagoAdapter extends BaseAdapter {
             imageView = (ImageView) convertView;
         }
 
-        imageView.setBackgroundColor(stones[position]);
+        imageView.setBackgroundColor(stones[position / 6][position % 6]);
 
         return imageView;
     }
 
-    public void placeStone(int position, int currentPlayer) {
-
-
-     /*   if (currentPlayer == 0) {
-            imageView.setBackgroundColor(Color.BLACK);
-        } else if (currentPlayer == 1) {
-            imageView.setBackgroundColor(Color.WHITE);
-        }
-        notifyDataSetChanged();
-    }*/
-
-        stones[position] = (currentPlayer == 0) ? Color.BLACK : Color.WHITE;
+    public void placeStone(int selectedRow, int selectedCol, int currentPlayer) {
+        
+        stones[selectedRow][selectedCol] = (currentPlayer == 0) ? Color.BLACK : Color.WHITE;
         notifyDataSetChanged();
 
     }

@@ -17,7 +17,7 @@ public class GameActivity extends AppCompatActivity {
     private pentagoAdapter adapter;
     private int currentPlayer = 0; // 0은 흑, 1은 백
     private int selectedRow, selectedCol;
-    private int position;
+    private int[][] boardState = new int[6][6];
     private Button placeCompleteButton,onRotationSensorButton,offRotationSensorButton;
 
     @Override
@@ -25,11 +25,17 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        adapter = new pentagoAdapter(this, gridView);
+        adapter = new pentagoAdapter(this);
 
         placeCompleteButton = findViewById(R.id.placeCompleteButton);
         onRotationSensorButton = findViewById(R.id.onRotationSensorButton);
         offRotationSensorButton = findViewById(R.id.offRotationSensorButton);
+
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 6; j++) {
+                boardState[i][j] = 10;
+            }
+        }
 
         placeCompleteButton.setOnClickListener(new View.OnClickListener() {
 
@@ -78,7 +84,6 @@ public class GameActivity extends AppCompatActivity {
 
         selectedRow = position / 6;
         selectedCol = position % 6;
-        this.position = position;
 
     }
 
@@ -87,9 +92,27 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void match() {
-        adapter.placeStone(position, currentPlayer);
+        adapter.placeStone(selectedRow, selectedCol, currentPlayer);
+        updateBoarState(selectedRow, selectedCol, currentPlayer);
+
         togglePlayer();
 
+    }
+
+    private void updateBoarState(int selectedRow, int selectedCol, int currentPlayer) {
+        boardState[selectedRow][selectedCol] = (currentPlayer == 0) ? 0 : 1;
+    }
+
+    private void setRotationArea() {
+
+    }
+
+    private void rotateSelectedArea() {
+
+    }
+
+    private void checkWinner() {
+        
     }
 
 
