@@ -111,11 +111,9 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    private void checkWinner() {
-        
+    private boolean checkWinner(){
+        // bool형식으로 true, false로 return하게 -> win했는지 확인 명확함
+        // "누가 win 했는가"도 따져야함
     }
-
-
-
 }
 
