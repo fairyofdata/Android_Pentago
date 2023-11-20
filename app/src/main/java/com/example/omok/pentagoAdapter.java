@@ -63,13 +63,27 @@ public class pentagoAdapter extends BaseAdapter {
     }
 
     public void placeStone(int selectedRow, int selectedCol, int currentPlayer) {
-        
+
         stones[selectedRow][selectedCol] = (currentPlayer == 0) ? Color.BLACK : Color.WHITE;
         notifyDataSetChanged();
 
     }
 
-    public void placeRotationArea() {
+    public void placeRotationArea(int areaRow, int areaCol, int [][] rotateState) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (rotateState[i][j] == 0) {
+                    stones[areaRow * 3 + i][areaCol * 3 + j] = Color.BLACK;
+                } else if (rotateState[i][j] == 1) {
+                    stones[areaRow * 3 + i][areaCol * 3 + j] = Color.WHITE;
+
+                } else if (rotateState[i][j] == 10) {
+                    stones[areaRow * 3 + i][areaCol * 3 + j] = Color.GRAY;
+
+                }
+                notifyDataSetChanged();
+            }
+        }
 
     }
 }
