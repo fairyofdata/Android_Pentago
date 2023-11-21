@@ -52,10 +52,14 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if (boardState[selectedRow][selectedCol] == 10) {
+                if (boardState[selectedRow][selectedCol] == 10 && matchFlag == 0) {
                     matchPlaceStone();
+                    toggleFlag();
+                } else if (matchFlag == 1){
+                    Toast.makeText(GameActivity.this, "무조건 4개의 판 중 하나를 돌려야합니다.", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(GameActivity.this, "Select position Again.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(GameActivity.this, "돌이 놓여있습니다. 다른 좌표를 선택하세요.", Toast.LENGTH_SHORT).show();
+
                 }
             }
         });
@@ -112,7 +116,8 @@ public class GameActivity extends AppCompatActivity {
                 showQuarterState();
                 showRotateState();
                 changedBoardState();
-                //checkWinner();
+                checkWinner();
+                toggleFlag();
                 removeButton(onRotationSensorButton, offRotationSensorButton);
 
 
@@ -134,6 +139,7 @@ public class GameActivity extends AppCompatActivity {
                 showRotateState();
                 changedBoardState();
                 checkWinner();
+                toggleFlag();
                 removeButton(onRotationSensorButton, offRotationSensorButton);
 
 
@@ -147,8 +153,7 @@ public class GameActivity extends AppCompatActivity {
 
         ActivityLayout.addView(onRotationSensorButton);
         ActivityLayout.addView(offRotationSensorButton);
-        Toast.makeText(this, "Button Added", Toast.LENGTH_SHORT).show();
-        Log.d("Debug", "addButton() - Buttons added to layout");
+
 
     }
 
@@ -192,12 +197,12 @@ public class GameActivity extends AppCompatActivity {
             areaRow = 0;
             areaCol = 0;
 
-        } else if (selectedRow >= 3 && selectedRow <= 5 && selectedCol >= 0 && selectedCol <= 2) {
+        } else if (selectedRow >= 0 && selectedRow <= 2 && selectedCol >= 3 && selectedCol <= 5) {
             areaRow = 0;
             areaCol = 1;
 
 
-        } else if (selectedRow >= 0 && selectedRow <= 2 && selectedCol >= 3 && selectedCol <= 5) {
+        } else if (selectedRow >= 3 && selectedRow <= 5 && selectedCol >= 0 && selectedCol <= 2) {
             areaRow = 1;
             areaCol = 0;
 
@@ -206,6 +211,8 @@ public class GameActivity extends AppCompatActivity {
             areaCol = 1;
 
         }
+
+        Log.d("BoardState", "areaRow, areaCol :" + areaRow + ", " + areaCol );
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
@@ -238,16 +245,51 @@ public class GameActivity extends AppCompatActivity {
 
     private void checkWinner() {
 
+
+
         int winnerPlayer = 10;
 
-        winnerPlayer = checkHorizontalWinner();
-        alertWinner(winnerPlayer);
-        winnerPlayer = checkVertical();
-        alertWinner(winnerPlayer);
-        winnerPlayer = checkLeftDiagonal();
-        alertWinner(winnerPlayer);
-        winnerPlayer = checkRightDiagonal();
-        alertWinner(winnerPlayer);
+
+        try {
+            Log.d("BoardState", "First " + winnerPlayer);
+            showBoardState();
+
+            winnerPlayer = checkHorizontalWinner();
+            Log.d("BoardState", "Second " + winnerPlayer);
+            alertWinner(winnerPlayer);
+
+
+        } catch (Exception e) {
+            Log.d("Debug1", "Error horizontal " + e);
+        }
+
+        try {
+            winnerPlayer = checkVertical();
+            alertWinner(winnerPlayer);
+
+
+        } catch (Exception e) {
+            Log.d("Debug1", "Error vertical " + e);
+        }
+
+        try {
+            winnerPlayer = checkLeftDiagonal();
+            alertWinner(winnerPlayer);
+
+
+        } catch (Exception e) {
+            Log.d("Debug1", "Error left diagonal " + e);
+        }
+
+        try {
+
+            winnerPlayer = checkRightDiagonal();
+            alertWinner(winnerPlayer);
+
+        } catch (Exception e) {
+            Log.d("Debug1", "Error right diagonal " + e);
+        }
+
 
     }
 
@@ -264,7 +306,8 @@ public class GameActivity extends AppCompatActivity {
             return;
         }
 
-        Toast.makeText(this, winnerColor + "is Winner!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, winnerColor + " is Winner!", Toast.LENGTH_SHORT).show();
+        Log.d("BoardState", winnerColor);
 
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
@@ -277,13 +320,17 @@ public class GameActivity extends AppCompatActivity {
 
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 2; j++) {
+                checkSum = 0;
+                Log.d("BoardState", "iterater i, j:" + i + "," + j);
                 for (int k = 0; k < 5; k++) {
                     checkSum += boardState[i][j + k];
-                    if (checkSum == 0) {
-                        return 0;
-                    } else if (checkSum == 5) {
-                        return 1;
-                    }
+
+                }
+                Log.d("BoardState", "checkSum" +  checkSum);
+                if (checkSum == 0) {
+                    return 0;
+                } else if (checkSum == 5) {
+                    return 1;
                 }
             }
         }
@@ -296,13 +343,14 @@ public class GameActivity extends AppCompatActivity {
 
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 2; j++) {
+                checkSum = 0;
                 for (int k = 0; k < 5; k++) {
                     checkSum += boardState[j + k][i];
-                    if (checkSum == 0) {
-                        return 0;
-                    } else if (checkSum == 5) {
-                        return 1;
-                    }
+                }
+                if (checkSum == 0) {
+                    return 0;
+                } else if (checkSum == 5) {
+                    return 1;
                 }
             }
         }
@@ -316,14 +364,16 @@ public class GameActivity extends AppCompatActivity {
 
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 2; j++) {
+                checkSum = 0;
                 for (int k = 0; k < 5; k++) {
                     checkSum += boardState[i + k][j + k];
-                    if (checkSum == 0) {
-                        return 0;
-                    } else if (checkSum == 5) {
-                        return 1;
-                    }
 
+
+                }
+                if (checkSum == 0) {
+                    return 0;
+                } else if (checkSum == 5) {
+                    return 1;
                 }
             }
         }
@@ -338,14 +388,14 @@ public class GameActivity extends AppCompatActivity {
 
         for (int i = 4; i < 6; i++) {
             for (int j = 4; j < 6; j++) {
+                checkSum = 0;
                 for (int k = 0; k < 5; k++) {
-                    checkSum += boardState[i + k][j + k];
-                    if (checkSum == 0) {
-                        return 0;
-                    } else if (checkSum == 5) {
-                        return 1;
-                    }
-
+                    checkSum += boardState[i - k][j - k];
+                }
+                if (checkSum == 0) {
+                    return 0;
+                } else if (checkSum == 5) {
+                    return 1;
                 }
             }
         }
@@ -355,13 +405,13 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void changedBoardState() {
-        showBoardState();
+        //showBoardState();
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 boardState[3 * areaRow + i][3 * areaCol + j] = rotateState[i][j];
             }
         }
-        showChangedBoardState();
+        //showChangedBoardState();
     }
 
     private void showBoardState() {
