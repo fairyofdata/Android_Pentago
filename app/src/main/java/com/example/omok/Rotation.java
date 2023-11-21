@@ -16,7 +16,13 @@ public class Rotation {
     private Sensor gyroscopeSensor;
     private SensorEventListener gyroscopeEventListener;
 
-    private boolean isEventNeed = false;
+    private boolean isEventNeed = false;    // true면 회전 작동 실행 가능
+
+    private int rotationDirection = 0; // default : 0
+
+    public int getRotationDirection() {
+        return rotationDirection;
+    }
 
     public Rotation(Context context) {
         this.context = context; // 생성자에서 context 초기화
@@ -29,17 +35,17 @@ public class Rotation {
         if (gyroscopeSensor != null) {
             sensorManager.registerListener(gyroscopeEventListener, gyroscopeSensor, SensorManager.SENSOR_DELAY_NORMAL);
         } else {
-            Toast.makeText(context, "Gyroscope sensor is not supported", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Gyroscope sensor is not supported", Toast.LENGTH_SHORT).show()
         }
     }
-
+    ;
     public void onPause() {
         sensorManager.unregisterListener(gyroscopeEventListener);
     }
 
     public void setEventNeed(boolean eventNeed) {
         isEventNeed = eventNeed;
-    }
+    } 
 
     private class RotatingSensorEventListener implements SensorEventListener {
 
@@ -54,11 +60,15 @@ public class Rotation {
             if (Math.abs(x) > ROTATION_THRESHOLD) {
                 if (x > 0) {
                     Toast.makeText(context, "Rotated to the right", Toast.LENGTH_SHORT).show();
+                    rotationDirection = 1;
                     System.out.println("Right");
                 } else {
                     Toast.makeText(context, "Rotated to the left", Toast.LENGTH_SHORT).show();
+                    rotationDirection = -1;
                     System.out.println("Left");
                 }
+            } else {
+                rotationDirection = 0;
             }
         }
 
