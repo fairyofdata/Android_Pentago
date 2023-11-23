@@ -1,6 +1,8 @@
 package com.example.omok;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -71,6 +73,7 @@ public class GameActivity extends AppCompatActivity {
 
                 if (selectedRow == -1 || selectedCol == -1) { // 아무것도 선택하지 않고 Place Stone을 했을 경우
                     Toast.makeText(GameActivity.this, "첫 좌표를 선택하세요.", Toast.LENGTH_SHORT).show();
+                    return;
                 }
 
 
@@ -177,6 +180,7 @@ public class GameActivity extends AppCompatActivity {
         updateBoarState(selectedRow, selectedCol, currentPlayer); // boardState 업데이트
         adapter.placeStone(selectedRow, selectedCol, currentPlayer); // Adapter 업데이트
         addRotationButtons(); // 버튼 동적 추가
+        checkWinner();
 
     }
 
@@ -335,9 +339,16 @@ public class GameActivity extends AppCompatActivity {
         Toast.makeText(this, winnerColor + " is Winner!", Toast.LENGTH_SHORT).show(); // 승자 토스트 메서드 출력
         Log.d("BoardState", winnerColor);
 
-        Intent intent = new Intent(this, MainActivity.class); // 해당 액티비티 종료
-        startActivity(intent);
-        finish();
+        new Handler(Looper.myLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(GameActivity.this, MainActivity.class); // 해당 액티비티 종료
+                startActivity(intent);
+                finish();
+            }
+        }, 3000);
+
+
     }
 
 
