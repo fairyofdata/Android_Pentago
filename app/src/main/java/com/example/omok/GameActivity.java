@@ -19,16 +19,17 @@ public class GameActivity extends AppCompatActivity {
 
     private pentagoAdapter adapter;
     private int currentPlayer = 0; // 0은 흑, 1은 백
-    private int matchFlag = 0;
-    private int selectedRow, selectedCol;
+    private int buttonActive = 0; // Place Complete 버튼을 활성화 시키는 변수, 0: 활성화, 1: 비활성화
+    private int selectedRow, selectedCol; // 사용자가 선택한 좌표
 
-    private int areaRow, areaCol;
-    private int[][] boardState = new int[6][6];
+    private int areaRow, areaCol; // 사용자가 돌릴 4개의 영역 좌표
+    private int[][] boardState = new int[6][6]; // 숫자로 동작하는 실제 6X6 보드판, 0: Black, 1: White, 10: Gray (empty)
 
-    private int[][] quarterBoard = new int[3][3];
-    private int[][] rotateState = new int[3][3];
-    private Button placeCompleteButton;
-    private LinearLayout ActivityLayout;
+    private int[][] quarterBoard = new int[3][3]; // 사용자가 돌릴 3X3 테이블, boardState의 4분의 1
+    private int[][] rotateState = new int[3][3]; // 사용자가 돌린 3X3 테이블
+
+    private Button placeCompleteButton; // 돌의 위치를 확정 짓는 버튼
+    private LinearLayout ActivityLayout; // 동적으로 버튼을 생성해 xml과 연결하기 위해 필요한 선언
 
 
 
@@ -37,65 +38,62 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        adapter = new pentagoAdapter(this);
-        ActivityLayout = findViewById(R.id.linearLayout);
-        placeCompleteButton = findViewById(R.id.placeCompleteButton);
+        adapter = new pentagoAdapter(this); // gridView를 관리하는 Adapter과 현 Activity를 연결
+        ActivityLayout = findViewById(R.id.linearLayout); // activity_game.xml의 LinearLayout id와 연결
+        placeCompleteButton = findViewById(R.id.placeCompleteButton); // 위와 동일 위치의 Button id와 연결
+        gridView = findViewById(R.id.gridView);
 
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 6; j++) {
-                boardState[i][j] = 10;
+        resetBoardState(); // 보드 판을 초기화 시키는 메서드
+
+
+        gridView.setAdapter(adapter);
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) { // 6X6 보드 판을 클릭할 시
+
+                updateSeletedPosition(position); // 현재 좌표를 변수에 저장
+                if (buttonActive == 1) {
+
+                    updatedSelectedArea(selectedRow, selectedCol); // Place Complete를 선택 시, 회전 시킬 영역을 선택
+                } else {
+                    Toast.makeText(GameActivity.this, "회전시킬 영역을 선택하세요.", Toast.LENGTH_SHORT).show();
+                }
+
+
             }
-        }
+        });
 
         placeCompleteButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
 
-                if (boardState[selectedRow][selectedCol] == 10 && matchFlag == 0) {
-                    matchPlaceStone();
-                    toggleFlag();
-                } else if (matchFlag == 1){
-                    Toast.makeText(GameActivity.this, "무조건 4개의 판 중 하나를 돌려야합니다.", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(GameActivity.this, "돌이 놓여있습니다. 다른 좌표를 선택하세요.", Toast.LENGTH_SHORT).show();
+                if (boardState[selectedRow][selectedCol] == 10 && buttonActive == 0) { // 선택한 위치가 empty일 경우, buttonActivie가 0일 경우 실행
+                    placeStoneInGame();
+                    toggleButtonActive();
+                } else if (buttonActive == 1){ // Place Complete 버튼을 누른 뒤, Rotation을 실행 하지 않은 경우
+                    Toast.makeText(GameActivity.this, "반드시 보드의 4영역 중 한 영역을 회전 시켜야합니다.", Toast.LENGTH_SHORT).show();
+                } else { // boardState가 empty가 아닐 경우
+                    Toast.makeText(GameActivity.this, "빈 좌표가 아닙니다. 다른 좌표를 선택하세요.", Toast.LENGTH_SHORT).show();
 
                 }
             }
         });
 
 
-        gridView = findViewById(R.id.gridView);
-        gridView.setAdapter(adapter);
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                setClickPosition(position);
-                setRotationArea(selectedRow, selectedCol);
-
-            }
-        });
-
 
 
     }
 
-    private void setClickPosition(int position) {
+    private void updateSeletedPosition(int clickedPosition) {
 
-        selectedRow = position / 6;
-        selectedCol = position % 6;
+        selectedRow = clickedPosition / 6;
+        selectedCol = clickedPosition % 6;
 
     }
 
-    private void turn() {
-        adapter.placeStone(selectedRow, selectedCol, currentPlayer);
-        updateBoarState(selectedRow, selectedCol, currentPlayer);
-        addButton();
-        Log.d("Debug", "turn() - Button added");
-    }
 
-    private void addButton() {
+    private void addRotationButtons() {
 
         Button onRotationSensorButton = new Button(this);
         Button offRotationSensorButton = new Button(this);
@@ -112,13 +110,15 @@ public class GameActivity extends AppCompatActivity {
 
 
                 rotateState90Right();
-                adapter.placeRotationArea(areaRow, areaCol, rotateState);
+
                 showQuarterState();
                 showRotateState();
-                changedBoardState();
+
+                applyChangedState();
+
                 checkWinner();
-                toggleFlag();
-                removeButton(onRotationSensorButton, offRotationSensorButton);
+                toggleButtonActive();
+                removeRotationButtons(onRotationSensorButton, offRotationSensorButton);
 
 
             }
@@ -134,13 +134,15 @@ public class GameActivity extends AppCompatActivity {
 
 
                 rotateState90Left();
-                adapter.placeRotationArea(areaRow, areaCol, rotateState);
+
                 showQuarterState();
                 showRotateState();
-                changedBoardState();
+
+                applyChangedState();
+
                 checkWinner();
-                toggleFlag();
-                removeButton(onRotationSensorButton, offRotationSensorButton);
+                toggleButtonActive();
+                removeRotationButtons(onRotationSensorButton, offRotationSensorButton);
 
 
 
@@ -157,34 +159,49 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    private void removeButton(Button onRotationSensorButton, Button offRotationSensorButton) {
+    private void resetBoardState() {
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 6; j++) {
+                boardState[i][j] = 10;
+            }
+        }
+
+    }
+
+    private void applyChangedState() {
+        adapter.placeRotationArea(areaRow, areaCol, rotateState);
+        changedBoardState();
+
+    }
+
+
+    private void removeRotationButtons(Button onRotationSensorButton, Button offRotationSensorButton) {
         ActivityLayout.removeView(onRotationSensorButton);
         ActivityLayout.removeView(offRotationSensorButton);
         Log.d("Debug", "removeButton() - Buttons removed from layout");
     }
 
-    private void addOffRotationButton() {
-
-
-    }
 
     private void togglePlayer() {
         currentPlayer = (currentPlayer == 0) ? 1 : 0;
     }
 
-    private void toggleFlag() {
-        matchFlag = (matchFlag == 0) ? 1 : 0;
+    private void toggleButtonActive() {
+        buttonActive = (buttonActive == 0) ? 1 : 0;
     }
 
-    private void matchPlaceStone() {
-        turn();
+    private void placeStoneInGame() {
+        adapter.placeStone(selectedRow, selectedCol, currentPlayer);
+        updateBoarState(selectedRow, selectedCol, currentPlayer);
+        addRotationButtons();
         togglePlayer();
 
     }
 
-    private void matchRotateStone() {
+    private void rotationBoardInGame() {
 
     }
+
 
 
 
@@ -192,7 +209,7 @@ public class GameActivity extends AppCompatActivity {
         boardState[selectedRow][selectedCol] = (currentPlayer == 0) ? 0 : 1;
     }
 
-    private void setRotationArea(int selectedRow, int selectedCol) {
+    private void updatedSelectedArea(int selectedRow, int selectedCol) {
         if (selectedRow >= 0 && selectedRow <= 2 && selectedCol >= 0 && selectedCol <= 2) {
             areaRow = 0;
             areaCol = 0;
@@ -241,7 +258,7 @@ public class GameActivity extends AppCompatActivity {
         }
 
     }
-    
+
 
     private void checkWinner() {
 
@@ -468,5 +485,3 @@ public class GameActivity extends AppCompatActivity {
 
     }
 }
-
-
