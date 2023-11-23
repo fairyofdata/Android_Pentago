@@ -29,6 +29,8 @@ public class GameActivity extends AppCompatActivity {
     private int[][] rotateState = new int[3][3]; // 사용자가 돌린 3X3 테이블
 
     private Button placeCompleteButton; // 돌의 위치를 확정 짓는 버튼
+    private Button onRotationSensorButton;
+    private Button offRotationSensorButton;
     private LinearLayout ActivityLayout; // 동적으로 버튼을 생성해 xml과 연결하기 위해 필요한 선언
 
 
@@ -95,8 +97,8 @@ public class GameActivity extends AppCompatActivity {
 
     private void addRotationButtons() {
 
-        Button onRotationSensorButton = new Button(this);
-        Button offRotationSensorButton = new Button(this);
+        onRotationSensorButton = new Button(this);
+        offRotationSensorButton = new Button(this);
 
         onRotationSensorButton.setText("On Rotation Sensor");
         offRotationSensorButton.setText("Off Rotation Sensor");
@@ -111,14 +113,12 @@ public class GameActivity extends AppCompatActivity {
 
                 rotateState90Right();
 
-                showQuarterState();
-                showRotateState();
+                //showQuarterState();
+                //showRotateState();
 
                 applyChangedState();
 
-                checkWinner();
-                toggleButtonActive();
-                removeRotationButtons(onRotationSensorButton, offRotationSensorButton);
+                checkWinnerInGame();
 
 
             }
@@ -135,18 +135,12 @@ public class GameActivity extends AppCompatActivity {
 
                 rotateState90Left();
 
-                showQuarterState();
-                showRotateState();
+                //showQuarterState();
+                //showRotateState();
 
                 applyChangedState();
 
-                checkWinner();
-                toggleButtonActive();
-                removeRotationButtons(onRotationSensorButton, offRotationSensorButton);
-
-
-
-
+                checkWinnerInGame();
 
             }
         });
@@ -168,6 +162,14 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
+    private void checkWinnerInGame() {
+        checkWinner();
+        toggleButtonActive();
+        togglePlayer();
+        removeRotationButtons();
+
+    }
+
     private void applyChangedState() {
         adapter.placeRotationArea(areaRow, areaCol, rotateState);
         changedBoardState();
@@ -175,7 +177,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
 
-    private void removeRotationButtons(Button onRotationSensorButton, Button offRotationSensorButton) {
+    private void removeRotationButtons() {
         ActivityLayout.removeView(onRotationSensorButton);
         ActivityLayout.removeView(offRotationSensorButton);
         Log.d("Debug", "removeButton() - Buttons removed from layout");
@@ -194,12 +196,20 @@ public class GameActivity extends AppCompatActivity {
         adapter.placeStone(selectedRow, selectedCol, currentPlayer);
         updateBoarState(selectedRow, selectedCol, currentPlayer);
         addRotationButtons();
-        togglePlayer();
 
     }
 
     private void rotationBoardInGame() {
 
+    }
+
+    private void updateQuarterState() {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                quarterBoard[i][j] = boardState[areaRow * 3 + i][areaCol * 3 + j];
+            }
+        }
+        showQuarterState();
     }
 
 
@@ -231,16 +241,13 @@ public class GameActivity extends AppCompatActivity {
 
         Log.d("BoardState", "areaRow, areaCol :" + areaRow + ", " + areaCol );
 
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                quarterBoard[i][j] = boardState[areaRow * 3 + i][areaCol * 3 + j];
-            }
-        }
-        showQuarterState();
+
 
     }
 
     private void rotateState90Right() {
+
+        updateQuarterState();
 
         for (int i = 0; i < 3; i ++) {
             for (int j = 0; j < 3; j ++) {
@@ -251,6 +258,9 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void rotateState90Left() {
+
+        updateQuarterState();
+
         for (int i = 0; i < 3; i ++) {
             for (int j = 0; j < 3; j ++) {
                 rotateState[i][j] = quarterBoard[j][2 - i];
