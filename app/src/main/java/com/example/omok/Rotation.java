@@ -5,6 +5,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.util.Log;
 import android.widget.Toast;
 
 public class Rotation {
@@ -22,7 +23,7 @@ public class Rotation {
 
     public int getRotationDirection() {
         return rotationDirection;
-    }
+    }   // to get rotation direction in GameActivity.java
 
     public Rotation(Context context) {
         this.context = context; // 생성자에서 context 초기화
@@ -36,6 +37,7 @@ public class Rotation {
             sensorManager.registerListener(gyroscopeEventListener, gyroscopeSensor, SensorManager.SENSOR_DELAY_NORMAL);
         } else {
             Toast.makeText(context, "Gyroscope sensor is not supported", Toast.LENGTH_SHORT).show();
+            Log.d("Rotation", "Gyroscope sensor not supported!!");
         }
     }
     ;
@@ -52,6 +54,7 @@ public class Rotation {
         @Override
         public void onSensorChanged(SensorEvent event) {
             if (!isEventNeed) {
+                Log.d("Rotation", "Gyroscope : 'isEventNeed' is false");
                 return;
             }
 
@@ -61,14 +64,15 @@ public class Rotation {
                 if (x > 0) {
                     Toast.makeText(context, "Rotated to the right", Toast.LENGTH_SHORT).show();
                     rotationDirection = 1;
-                    System.out.println("Right");
+                    Log.d("Rotation", "Gyroscope : right, " + x);
                 } else {
                     Toast.makeText(context, "Rotated to the left", Toast.LENGTH_SHORT).show();
                     rotationDirection = -1;
-                    System.out.println("Left");
+                    Log.d("Rotation", "Gyroscope : left, " + x);
                 }
             } else {
                 rotationDirection = 0;
+                Log.d("Rotation", "Gyroscope : None");
             }
         }
 
