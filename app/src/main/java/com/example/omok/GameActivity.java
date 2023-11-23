@@ -53,13 +53,10 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) { // 6X6 보드 판을 클릭할 시
 
-                updateSeletedPosition(position); // 현재 좌표를 변수에 저장
-                if (buttonActive == 1) {
 
-                    updatedSelectedArea(selectedRow, selectedCol); // Place Complete를 선택 시, 회전 시킬 영역을 선택
-                } else {
-                    Toast.makeText(GameActivity.this, "회전시킬 영역을 선택하세요.", Toast.LENGTH_SHORT).show();
-                }
+                updateSeletedPosition(position); // 현재 좌표를 변수에 저장
+                updatedSelectedArea(selectedRow, selectedCol); // Place Complete를 선택 시, 회전 시킬 영역을 선택
+
 
 
             }
@@ -109,15 +106,7 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-
-
-                rotateState90Right();
-
-                //showQuarterState();
-                //showRotateState();
-
-                applyChangedState();
-
+                rotateRight90InGame();
                 checkWinnerInGame();
 
 
@@ -131,15 +120,7 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-
-
-                rotateState90Left();
-
-                //showQuarterState();
-                //showRotateState();
-
-                applyChangedState();
-
+                rotateLeft90InGame();
                 checkWinnerInGame();
 
             }
@@ -159,6 +140,22 @@ public class GameActivity extends AppCompatActivity {
                 boardState[i][j] = 10;
             }
         }
+
+    }
+
+    private void rotateRight90InGame() {
+        rotateState90Right();
+        //showQuarterState();
+        //showRotateState();
+        applyChangedState();
+
+    }
+
+    private void rotateLeft90InGame() {
+        rotateState90Left();
+        //showQuarterState();
+        //showRotateState();
+        applyChangedState();
 
     }
 
@@ -196,10 +193,6 @@ public class GameActivity extends AppCompatActivity {
         adapter.placeStone(selectedRow, selectedCol, currentPlayer);
         updateBoarState(selectedRow, selectedCol, currentPlayer);
         addRotationButtons();
-
-    }
-
-    private void rotationBoardInGame() {
 
     }
 
@@ -413,11 +406,11 @@ public class GameActivity extends AppCompatActivity {
 
         int checkSum = 0;
 
-        for (int i = 4; i < 6; i++) {
+        for (int i = 0; i < 2; i++) {
             for (int j = 4; j < 6; j++) {
                 checkSum = 0;
                 for (int k = 0; k < 5; k++) {
-                    checkSum += boardState[i - k][j - k];
+                    checkSum += boardState[i + k][j - k];
                 }
                 if (checkSum == 0) {
                     return 0;
