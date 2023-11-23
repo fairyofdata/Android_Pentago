@@ -35,7 +35,7 @@ public class Rotation {
         if (gyroscopeSensor != null) {
             sensorManager.registerListener(gyroscopeEventListener, gyroscopeSensor, SensorManager.SENSOR_DELAY_NORMAL);
         } else {
-            Toast.makeText(context, "Gyroscope sensor is not supported", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Gyroscope sensor is not supported", Toast.LENGTH_SHORT).show();
         }
     }
     ;
