@@ -28,7 +28,7 @@ public class GameActivity extends AppCompatActivity {
     private int[][] quarterBoard = new int[3][3]; // 사용자가 돌릴 3X3 테이블, boardState의 4분의 1
     private int[][] rotateState = new int[3][3]; // 사용자가 돌린 3X3 테이블
 
-    private Button placeCompleteButton; // 돌의 위치를 확정 짓는 버튼
+    private Button placeStoneButton; // 돌의 위치를 확정 짓는 버튼
     private Button onRotationSensorButton;
     private Button offRotationSensorButton;
     private LinearLayout ActivityLayout; // 동적으로 버튼을 생성해 xml과 연결하기 위해 필요한 선언
@@ -42,7 +42,7 @@ public class GameActivity extends AppCompatActivity {
 
         adapter = new pentagoAdapter(this); // gridView를 관리하는 Adapter과 현 Activity를 연결
         ActivityLayout = findViewById(R.id.linearLayout); // activity_game.xml의 LinearLayout id와 연결
-        placeCompleteButton = findViewById(R.id.placeCompleteButton); // 위와 동일 위치의 Button id와 연결
+        placeStoneButton = findViewById(R.id.placeStoneButton); // 위와 동일 위치의 Button id와 연결
         gridView = findViewById(R.id.gridView);
 
         resetBoardState(); // 보드 판을 초기화 시키는 메서드
@@ -53,16 +53,13 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) { // 6X6 보드 판을 클릭할 시
 
-
                 updateSeletedPosition(position); // 현재 좌표를 변수에 저장
-                updatedSelectedArea(selectedRow, selectedCol); // Place Complete를 선택 시, 회전 시킬 영역을 선택
-
-
+                updatedSelectedArea(selectedRow, selectedCol); // 현재 회전 시킬 영역을 선택
 
             }
         });
 
-        placeCompleteButton.setOnClickListener(new View.OnClickListener() {
+        placeStoneButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
