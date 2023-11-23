@@ -34,6 +34,7 @@ public class GameActivity extends AppCompatActivity {
     private LinearLayout ActivityLayout; // 동적으로 버튼을 생성해 xml과 연결하기 위해 필요한 선언
 
     private Rotation rotation;      // Rotation.java 선언
+    private int rotationDirection = 0; // Rotation 변수
 
 
 
@@ -41,6 +42,9 @@ public class GameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        rotation = new Rotation(this);
+        rotation.registerGyroscope();
 
         adapter = new pentagoAdapter(this); // gridView를 관리하는 Adapter과 현 Activity를 연결
         ActivityLayout = findViewById(R.id.linearLayout); // activity_game.xml의 LinearLayout id와 연결
@@ -93,7 +97,7 @@ public class GameActivity extends AppCompatActivity {
         onRotationSensorButton = new Button(this); // 버튼 생성
         offRotationSensorButton = new Button(this);
 
-        onRotationSensorButton.setText("On Rotation Sensor"); // 버튼 text 생성
+        onRotationSensorButton.setText("Rotation Sensor"); // 버튼 text 생성
         offRotationSensorButton.setText("Off Rotation Sensor");
 
 
@@ -102,9 +106,20 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                rotateRight90InGame(); // 90도 돌리고
-                checkWinnerInGame(); // 승자 검사하고
+                rotationDirection = rotation.getRotationDirection();
 
+                if (rotationDirection != 0) {
+                    if (rotationDirection == 1) {
+                        rotateRight90InGame();
+                    } else if (rotationDirection == -1) {
+                        rotateLeft90InGame();
+                    }
+                    rotation.setEventNeed(false);
+                    checkWinnerInGame();
+                }  else {
+                    Log.d("Rotation", "Rotation Direction == 0");
+                    Toast.makeText(GameActivity.this, "No direction Selected!!", Toast.LENGTH_SHORT).show();
+                }
 
             }
         });
@@ -115,14 +130,13 @@ public class GameActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-
-                rotateLeft90InGame(); // 90도 돌리고
+                rotation.setEventNeed(false);
                 checkWinnerInGame(); // 승자 검사하고
             }
         });
 
         ActivityLayout.addView(onRotationSensorButton); // 실제 xml 에 동적으로 추가
-        ActivityLayout.addView(offRotationSensorButton);
+        //ActivityLayout.addView(offRotationSensorButton);
     }
 
     private void togglePlayer() { // 플레이어 변경
@@ -176,6 +190,7 @@ public class GameActivity extends AppCompatActivity {
 
         updateBoarState(selectedRow, selectedCol, currentPlayer); // boardState 업데이트
         adapter.placeStone(selectedRow, selectedCol, currentPlayer); // Adapter 업데이트
+        rotation.setEventNeed(true);
         addRotationButtons(); // 버튼 동적 추가
 
     }
@@ -269,7 +284,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void removeRotationButtons() { // 동적으로 추가한 버튼 제거
         ActivityLayout.removeView(onRotationSensorButton);
-        ActivityLayout.removeView(offRotationSensorButton);
+        // ActivityLayout.removeView(offRotationSensorButton);
         Log.d("Debug", "removeButton() - Buttons removed from layout");
     }
 
