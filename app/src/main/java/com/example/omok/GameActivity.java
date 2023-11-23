@@ -33,6 +33,8 @@ public class GameActivity extends AppCompatActivity {
     private Button offRotationSensorButton;
     private LinearLayout ActivityLayout; // 동적으로 버튼을 생성해 xml과 연결하기 위해 필요한 선언
 
+    private Rotation rotation;      // Rotation.java 선언
+
 
 
     @Override
