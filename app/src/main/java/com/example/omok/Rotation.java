@@ -9,7 +9,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class Rotation {
-    private static final float ROTATION_THRESHOLD = 1.0f;   // rotation 값의 임계점
+    private static final float ROTATION_THRESHOLD = 1.0f;   // rotation된 값의 임계점
 
     private Context context; // context 추가, for Toast msg.
 
