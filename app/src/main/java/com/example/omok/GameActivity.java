@@ -49,11 +49,14 @@ public class GameActivity extends AppCompatActivity {
 
         resetBoardState(); // 보드 판을 초기화 시키는 메서드
 
+        selectedRow = -1; // 첫 클릭을 반드시 실행하기 위해서 -1로 설정
+        selectedCol = -1;
 
         gridView.setAdapter(adapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) { // 6X6 보드 판을 클릭할 시
+
 
                 updateSeletedPosition(position); // 현재 좌표를 변수에 저장
                 updatedSelectedArea(selectedRow, selectedCol); // 현재 회전 시킬 영역을 선택
@@ -65,6 +68,11 @@ public class GameActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
+
+                if (selectedRow == -1 || selectedCol == -1) { // 아무것도 선택하지 않고 Place Stone을 했을 경우
+                    Toast.makeText(GameActivity.this, "첫 좌표를 선택하세요.", Toast.LENGTH_SHORT).show();
+                }
+
 
                 if (boardState[selectedRow][selectedCol] == 10 && buttonActive == 0) { // 선택한 위치가 empty일 경우, buttonActivie가 0일 경우 실행
                     placeStoneInGame();
@@ -78,25 +86,14 @@ public class GameActivity extends AppCompatActivity {
             }
         });
 
-
-
-
     }
 
-    private void updateSeletedPosition(int clickedPosition) {
+    private void addRotationButtons() { // 동적으로 버튼 추가하는 메서드
 
-        selectedRow = clickedPosition / 6;
-        selectedCol = clickedPosition % 6;
-
-    }
-
-
-    private void addRotationButtons() {
-
-        onRotationSensorButton = new Button(this);
+        onRotationSensorButton = new Button(this); // 버튼 생성
         offRotationSensorButton = new Button(this);
 
-        onRotationSensorButton.setText("On Rotation Sensor");
+        onRotationSensorButton.setText("On Rotation Sensor"); // 버튼 text 생성
         offRotationSensorButton.setText("Off Rotation Sensor");
 
 
@@ -105,8 +102,8 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                rotateRight90InGame();
-                checkWinnerInGame();
+                rotateRight90InGame(); // 90도 돌리고
+                checkWinnerInGame(); // 승자 검사하고
 
 
             }
@@ -119,99 +116,40 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                rotateLeft90InGame();
-                checkWinnerInGame();
-
+                rotateLeft90InGame(); // 90도 돌리고
+                checkWinnerInGame(); // 승자 검사하고
             }
         });
 
-
-
-        ActivityLayout.addView(onRotationSensorButton);
+        ActivityLayout.addView(onRotationSensorButton); // 실제 xml 에 동적으로 추가
         ActivityLayout.addView(offRotationSensorButton);
-
-
     }
 
-    private void resetBoardState() {
+    private void togglePlayer() { // 플레이어 변경
+        currentPlayer = (currentPlayer == 0) ? 1 : 0;
+    }
+
+    private void toggleButtonActive() { // 버튼 순서에 따른 안내문 검사를 위한 메서드
+        buttonActive = (buttonActive == 0) ? 1 : 0;
+    }
+
+    private void resetBoardState() { // 처음에 보드 판 상태를 empty, gray로 초기화 하는 메서드
+
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 6; j++) {
                 boardState[i][j] = 10;
             }
         }
-
-    }
-
-    private void rotateRight90InGame() {
-        rotateState90Right();
-        //showQuarterState();
-        //showRotateState();
-        applyChangedState();
-
-    }
-
-    private void rotateLeft90InGame() {
-        rotateState90Left();
-        //showQuarterState();
-        //showRotateState();
-        applyChangedState();
-
-    }
-
-    private void checkWinnerInGame() {
-        checkWinner();
-        toggleButtonActive();
-        togglePlayer();
-        removeRotationButtons();
-
-    }
-
-    private void applyChangedState() {
-        adapter.placeRotationArea(areaRow, areaCol, rotateState);
-        changedBoardState();
-
     }
 
 
-    private void removeRotationButtons() {
-        ActivityLayout.removeView(onRotationSensorButton);
-        ActivityLayout.removeView(offRotationSensorButton);
-        Log.d("Debug", "removeButton() - Buttons removed from layout");
+    private void updateSeletedPosition(int clickedPosition) { // 클릭한 포지션 값을 x, y로 변환하는 메서드
+
+        selectedRow = clickedPosition / 6;
+        selectedCol = clickedPosition % 6;
     }
 
-
-    private void togglePlayer() {
-        currentPlayer = (currentPlayer == 0) ? 1 : 0;
-    }
-
-    private void toggleButtonActive() {
-        buttonActive = (buttonActive == 0) ? 1 : 0;
-    }
-
-    private void placeStoneInGame() {
-        adapter.placeStone(selectedRow, selectedCol, currentPlayer);
-        updateBoarState(selectedRow, selectedCol, currentPlayer);
-        addRotationButtons();
-
-    }
-
-    private void updateQuarterState() {
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                quarterBoard[i][j] = boardState[areaRow * 3 + i][areaCol * 3 + j];
-            }
-        }
-        showQuarterState();
-    }
-
-
-
-
-    private void updateBoarState(int selectedRow, int selectedCol, int currentPlayer) {
-        boardState[selectedRow][selectedCol] = (currentPlayer == 0) ? 0 : 1;
-    }
-
-    private void updatedSelectedArea(int selectedRow, int selectedCol) {
+    private void updatedSelectedArea(int selectedRow, int selectedCol) { // 클릭한 포지션 값을 사분면 좌표로 변환하는 메서드
         if (selectedRow >= 0 && selectedRow <= 2 && selectedCol >= 0 && selectedCol <= 2) {
             areaRow = 0;
             areaCol = 0;
@@ -230,16 +168,42 @@ public class GameActivity extends AppCompatActivity {
             areaCol = 1;
 
         }
-
         Log.d("BoardState", "areaRow, areaCol :" + areaRow + ", " + areaCol );
+    }
 
 
+    private void placeStoneInGame() { // Place Stone이 액티비티 내에서 실제 값을 변경하는 부분
+
+        updateBoarState(selectedRow, selectedCol, currentPlayer); // boardState 업데이트
+        adapter.placeStone(selectedRow, selectedCol, currentPlayer); // Adapter 업데이트
+        addRotationButtons(); // 버튼 동적 추가
 
     }
 
-    private void rotateState90Right() {
+    private void updateBoarState(int selectedRow, int selectedCol, int currentPlayer) { // 흑, 백에 따라 boardState 값 업데이트
+        boardState[selectedRow][selectedCol] = (currentPlayer == 0) ? 0 : 1;
+    }
 
-        updateQuarterState();
+
+    private void rotateRight90InGame() { // 게임 내에서 오른쪽 90도로 회전시키는 메서드
+        rotateStateRight90(); // Quarter State 생성, Rotate State 생성
+        //showQuarterState();
+        //showRotateState();
+        applyChangedState(); // Rotate State 현재 BoardState에 적용
+
+    }
+
+    private void rotateLeft90InGame() { // 게임 내에서 왼쪽 90도로 회전시키는 메서드
+        rotateStateLeft90(); // Quarter State 생성, Rotate State 생성
+        //showQuarterState();
+        //showRotateState();
+        applyChangedState(); // Rotate State 현재 BoardState에 적용
+
+    }
+
+    private void rotateStateRight90() { // 90도 회전시켜 rotateState에 값 저장
+
+        updateQuarterState(); // 사분면 좌표에 따라 QuaterState 생성
 
         for (int i = 0; i < 3; i ++) {
             for (int j = 0; j < 3; j ++) {
@@ -249,9 +213,9 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    private void rotateState90Left() {
+    private void rotateStateLeft90() { // 90도 회전시켜 rotateState에 값 저장
 
-        updateQuarterState();
+        updateQuarterState();  // 사분면 좌표에 따라 QuaterState 생성
 
         for (int i = 0; i < 3; i ++) {
             for (int j = 0; j < 3; j ++) {
@@ -261,10 +225,55 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
+    private void updateQuarterState() {  // 사분면 좌표에 따라 QuaterState 생성
 
-    private void checkWinner() {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                quarterBoard[i][j] = boardState[areaRow * 3 + i][areaCol * 3 + j];
+            }
+        }
+        //showQuarterState();
+    }
+
+    private void applyChangedState() { // 변경된 State 값 적용
+
+        changedBoardState(); // 현재 boardState에 회전 시킨 값 업데이트
+        adapter.placeRotationArea(areaRow, areaCol, rotateState); // Adapter에게 회전된 값을 전달
+
+    }
+
+    private void changedBoardState() { // 현재 boardState에 회전 시킨 값 업데이트
+        //showBoardState();
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                boardState[3 * areaRow + i][3 * areaCol + j] = rotateState[i][j];
+            }
+        }
+        //showChangedBoardState();
+    }
 
 
+
+
+    private void checkWinnerInGame() {
+
+        checkWinner(); // 가로 세로 대각선 승자 검사 메서드
+        toggleButtonActive(); // 액티브 버튼 전환
+        togglePlayer(); // 플레이어 전환
+        removeRotationButtons(); // 추가된 동적 버튼 제거
+
+    }
+
+
+
+    private void removeRotationButtons() { // 동적으로 추가한 버튼 제거
+        ActivityLayout.removeView(onRotationSensorButton);
+        ActivityLayout.removeView(offRotationSensorButton);
+        Log.d("Debug", "removeButton() - Buttons removed from layout");
+    }
+
+    private void checkWinner() { // 가로 세로 대각선 승자 검출 메서드
 
         int winnerPlayer = 10;
 
@@ -312,28 +321,28 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-
-
-    private void alertWinner(int winnerPlayer) {
+    private void alertWinner(int winnerPlayer) { // 승자 검출 메서드
 
         String winnerColor;
-        if (winnerPlayer == 0) {
+        if (winnerPlayer == 0) { // 만약 승자가 0이라면
             winnerColor = "Black";
         } else if (winnerPlayer == 1) {
-            winnerColor = "White";
+            winnerColor = "White"; // 만약 승자가 1이라면
         } else {
             return;
         }
 
-        Toast.makeText(this, winnerColor + " is Winner!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, winnerColor + " is Winner!", Toast.LENGTH_SHORT).show(); // 승자 토스트 메서드 출력
         Log.d("BoardState", winnerColor);
 
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, MainActivity.class); // 해당 액티비티 종료
         startActivity(intent);
         finish();
     }
 
-    private int checkHorizontalWinner() {
+
+
+    private int checkHorizontalWinner() { // 가로 검사
 
         int checkSum = 0;
 
@@ -357,7 +366,7 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    private int checkVertical() {
+    private int checkVertical() { // 세로 검사
         int checkSum = 0;
 
         for (int i = 0; i < 6; i++) {
@@ -377,7 +386,7 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    private int checkRightDiagonal() {
+    private int checkRightDiagonal() { // 오른쪽 대각선 검사
 
         int checkSum = 0;
 
@@ -401,7 +410,7 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    private int checkLeftDiagonal() {
+    private int checkLeftDiagonal() { // 왼쪽 대각선 검사
 
         int checkSum = 0;
 
@@ -423,16 +432,7 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    private void changedBoardState() {
-        //showBoardState();
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                boardState[3 * areaRow + i][3 * areaCol + j] = rotateState[i][j];
-            }
-        }
-        //showChangedBoardState();
-    }
-
+    // 실제 값이 잘 변경되었는지를 체크하기 위핸 LogCat 메서드
     private void showBoardState() {
         Log.d("BoardState", "=====================");
         for (int i = 0; i < 6; i++) {

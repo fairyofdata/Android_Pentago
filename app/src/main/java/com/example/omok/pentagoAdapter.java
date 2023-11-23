@@ -62,14 +62,14 @@ public class pentagoAdapter extends BaseAdapter {
         return imageView;
     }
 
-    public void placeStone(int selectedRow, int selectedCol, int currentPlayer) {
+    public void placeStone(int selectedRow, int selectedCol, int currentPlayer) { // 클릭에 따라 gridView 업데이트
 
         stones[selectedRow][selectedCol] = (currentPlayer == 0) ? Color.BLACK : Color.WHITE;
         notifyDataSetChanged();
 
     }
 
-    public void placeRotationArea(int areaRow, int areaCol, int [][] rotateState) {
+    public void placeRotationArea(int areaRow, int areaCol, int [][] rotateState) { // 회전에 따라 gridView 업데이트
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 if (rotateState[i][j] == 0) {
