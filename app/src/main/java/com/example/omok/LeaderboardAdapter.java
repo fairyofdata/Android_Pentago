@@ -1,6 +1,5 @@
 package com.example.omok;
 
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +29,8 @@ public class LeaderboardAdapter extends RecyclerView.Adapter<LeaderboardAdapter.
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         PlayerScore playerScore = playerScores.get(position);
         holder.playerNameTextView.setText(playerScore.getPlayerName());
-        holder.scoreTextView.setText(String.valueOf(playerScore.getScore()));
+        holder.winsTextView.setText(String.valueOf(playerScore.getWins()));
+        holder.lossesTextView.setText(String.valueOf(playerScore.getLosses()));
     }
 
     @Override
@@ -40,12 +40,14 @@ public class LeaderboardAdapter extends RecyclerView.Adapter<LeaderboardAdapter.
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView playerNameTextView;
-        TextView scoreTextView;
+        TextView winsTextView;
+        TextView lossesTextView;
 
         public ViewHolder(View view) {
             super(view);
             playerNameTextView = view.findViewById(R.id.playerNameTextView);
-            scoreTextView = view.findViewById(R.id.scoreTextView);
+            winsTextView = view.findViewById(R.id.winsTextView);
+            lossesTextView = view.findViewById(R.id.lossesTextView);
         }
     }
 }
