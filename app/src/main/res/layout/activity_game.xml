@@ -11,23 +11,14 @@
         android:layout_height="wrap_content"
         android:text="Place Stone">
     </Button>
-    <!--
-        <Button
-            android:id="@+id/onRotationSensorButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="On Rotation">
-
-        </Button>
-
-        <Button
-            android:id="@+id/offRotationSensorButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Off Rotation">
-
-        </Button>
-        -->
+    <TextView
+        android:id="@+id/playerTurn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=" ~ player turn"
+        android:layout_gravity="center"
+        android:textSize="18sp"
+        android:textColor="#000000"/>
 
 
         <GridView

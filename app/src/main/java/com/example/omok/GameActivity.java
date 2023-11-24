@@ -7,6 +7,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import android.content.Intent;
@@ -33,6 +34,10 @@ public class GameActivity extends AppCompatActivity {
     private Button offRotationSensorButton;
     private LinearLayout ActivityLayout; // 동적으로 버튼을 생성해 xml과 연결하기 위해 필요한 선언
 
+    private TextView playertext;    // 어떤 플레이어의 차례인지 보여줌
+    private String playerName1;
+    private String playerName2;
+
     private Rotation rotation;      // Rotation.java 선언
     private int rotationDirection = 0; // Rotation 변수
 
@@ -50,6 +55,12 @@ public class GameActivity extends AppCompatActivity {
         ActivityLayout = findViewById(R.id.linearLayout); // activity_game.xml의 LinearLayout id와 연결
         placeStoneButton = findViewById(R.id.placeStoneButton); // 위와 동일 위치의 Button id와 연결
         gridView = findViewById(R.id.gridView);
+
+        playertext = findViewById(R.id.playerTurn);
+        Intent intent = getIntent();
+        playerName1 = intent.getStringExtra("PLAYER1_NAME");
+        playerName2 = intent.getStringExtra("PLAYER2_NAME");
+        playertext.setText(playerName1 + "`s turn");
 
         resetBoardState(); // 보드 판을 초기화 시키는 메서드
 
@@ -140,7 +151,13 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void togglePlayer() { // 플레이어 변경
-        currentPlayer = (currentPlayer == 0) ? 1 : 0;
+        if (currentPlayer == 0) {
+            playertext.setText(playerName2 + "`s turn");
+            currentPlayer = 1;
+        } else {
+            playertext.setText(playerName1 + "`s turn");
+            currentPlayer = 0;
+        }
     }
 
     private void toggleButtonActive() { // 버튼 순서에 따른 안내문 검사를 위한 메서드
@@ -338,21 +355,21 @@ public class GameActivity extends AppCompatActivity {
 
     private void alertWinner(int winnerPlayer) { // 승자 검출 메서드
 
-        String winnerColor;
+        String _winnerPlayer;
         if (winnerPlayer == 0) { // 만약 승자가 0이라면
-            winnerColor = "Black";
+            _winnerPlayer = playerName1;
         } else if (winnerPlayer == 1) {
-            winnerColor = "White"; // 만약 승자가 1이라면
+            _winnerPlayer = playerName2;
         } else {
             return;
         }
 
-        Toast.makeText(this, winnerColor + " is Winner!", Toast.LENGTH_SHORT).show(); // 승자 토스트 메서드 출력
-        Log.d("BoardState", winnerColor);
+        Toast.makeText(this, _winnerPlayer + " is Winner!", Toast.LENGTH_SHORT).show(); // 승자 토스트 메서드 출력
+        Log.d("BoardState", _winnerPlayer);
 
-        Intent intent = new Intent(this, MainActivity.class); // 해당 액티비티 종료
+        Intent intent = new Intent(this, LeaderboardActivity.class); // 해당 액티비티 종료
+        intent.putExtra("WINNER_NAME", _winnerPlayer);
         startActivity(intent);
-        finish();
     }
 
 
