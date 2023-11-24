@@ -12,7 +12,7 @@ import java.util.List;
 
 public class LeaderboardAdapter extends RecyclerView.Adapter<LeaderboardAdapter.ViewHolder> {
 
-    private List<PlayerScore> playerScores;
+    private final List<PlayerScore> playerScores;
 
     public LeaderboardAdapter(List<PlayerScore> playerScores) {
         this.playerScores = playerScores;
