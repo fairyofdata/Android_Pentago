@@ -107,11 +107,15 @@ public class GameActivity extends AppCompatActivity {
         });
         // Rotation 설정하는 switch
         Switch doRotation = findViewById(R.id.doRotation);
+
+
         doRotation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+
                 if (b) {doRotationBool = true;}
                 else {doRotationBool = false;}
+                
             }
         });
 
@@ -322,7 +326,14 @@ public class GameActivity extends AppCompatActivity {
         checkWinner(); // 가로 세로 대각선 승자 검사 메서드
         toggleButtonActive(); // 액티브 버튼 전환
         togglePlayer(); // 플레이어 전환
-        removeRotationButtons(); // 추가된 동적 버튼 제거
+
+        if (doRotationBool) {
+            removeRotationButtons(); // 추가된 동적 버튼 제거
+
+        } else {
+            removeRightLeftButtons();
+        }
+
 
     }
 
@@ -332,6 +343,12 @@ public class GameActivity extends AppCompatActivity {
         ActivityLayout.removeView(onRotationSensorButton);
         // ActivityLayout.removeView(offRotationSensorButton);
         Log.d("Debug", "removeButton() - Buttons removed from layout");
+    }
+
+    private void removeRightLeftButtons() {
+        ActivityLayout.removeView(onRightRotationButton);
+        ActivityLayout.removeView(onLeftRotationButton);
+
     }
 
     private void checkWinner() { // 가로 세로 대각선 승자 검출 메서드
