@@ -1,12 +1,40 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:padding="20dp" >
 
     <Button
-        android:id="@+id/startButton"
+        android:id="@+id/Tutorial"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Game Start"/>
+        android:text="튜토리얼 보기"
+        android:textSize="20dp" />
+
+    <Button
+        android:id="@+id/startGameButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="게임 시작하기"
+        android:textSize="20dp" />
+
+    <Button
+        android:id="@+id/leaderboardButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="리더보드 조회"
+        android:textSize="20dp" />
+
+    <EditText
+        android:id="@+id/player1"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Player 1" />
+    <EditText
+        android:id="@+id/player2"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Player 2" />
 
 </LinearLayout>

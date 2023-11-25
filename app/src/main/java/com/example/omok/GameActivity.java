@@ -1,14 +1,15 @@
 package com.example.omok;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.LinearLayout;
+import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import android.content.Intent;
@@ -32,10 +33,18 @@ public class GameActivity extends AppCompatActivity {
 
     private Button placeStoneButton; // 돌의 위치를 확정 짓는 버튼
     private Button onRotationSensorButton;
-    private Button offRotationSensorButton;
+    private Button onRightRotationButton;
+    private Button onLeftRotationButton;
     private LinearLayout ActivityLayout; // 동적으로 버튼을 생성해 xml과 연결하기 위해 필요한 선언
 
+    private TextView playertext;    // 어떤 플레이어의 차례인지 보여줌
+    private String playerName1;
+    private String playerName2;
+
     private Rotation rotation;      // Rotation.java 선언
+    private int rotationDirection = 0; // Rotation 변수
+    private Switch doRotationSwitch;    // Rotation기능 쓸 것인지 선택하는 스위치
+    private boolean doRotationBool;
 
 
 
@@ -44,10 +53,19 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
+        rotation = new Rotation(this);
+        rotation.registerGyroscope();
+
         adapter = new pentagoAdapter(this); // gridView를 관리하는 Adapter과 현 Activity를 연결
         ActivityLayout = findViewById(R.id.linearLayout); // activity_game.xml의 LinearLayout id와 연결
         placeStoneButton = findViewById(R.id.placeStoneButton); // 위와 동일 위치의 Button id와 연결
         gridView = findViewById(R.id.gridView);
+
+        playertext = findViewById(R.id.playerTurn);
+        Intent intent = getIntent();
+        playerName1 = intent.getStringExtra("PLAYER1_NAME");
+        playerName2 = intent.getStringExtra("PLAYER2_NAME");
+        playertext.setText(playerName1 + "`s turn");
 
         resetBoardState(); // 보드 판을 초기화 시키는 메서드
 
@@ -73,7 +91,6 @@ public class GameActivity extends AppCompatActivity {
 
                 if (selectedRow == -1 || selectedCol == -1) { // 아무것도 선택하지 않고 Place Stone을 했을 경우
                     Toast.makeText(GameActivity.this, "첫 좌표를 선택하세요.", Toast.LENGTH_SHORT).show();
-                    return;
                 }
 
 
@@ -88,48 +105,88 @@ public class GameActivity extends AppCompatActivity {
                 }
             }
         });
+        // Rotation 설정하는 switch
+        Switch doRotation = findViewById(R.id.doRotation);
+        doRotation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {doRotationBool = true;}
+                else {doRotationBool = false;}
+            }
+        });
 
+
+
+        // for test, player1 wins.
+        Button player1Win = findViewById(R.id.player1Win);
+        player1Win.setOnClickListener(this::onClickWinnerIsPlayer1);
+
+    }
+    private void onClickWinnerIsPlayer1(View view) {
+        alertWinner(0);
     }
 
     private void addRotationButtons() { // 동적으로 버튼 추가하는 메서드
+        if (doRotationBool) {
+            onRotationSensorButton = new Button(this); // 버튼 생성
 
-        onRotationSensorButton = new Button(this); // 버튼 생성
-        offRotationSensorButton = new Button(this);
+            onRotationSensorButton.setText("Rotation Sensor"); // 버튼 text 생성
+            onRotationSensorButton.setOnClickListener(new View.OnClickListener() {
 
-        onRotationSensorButton.setText("On Rotation Sensor"); // 버튼 text 생성
-        offRotationSensorButton.setText("Off Rotation Sensor");
+                @Override
+                public void onClick(View v) {
 
+                    rotationDirection = rotation.getRotationDirection();
 
-        onRotationSensorButton.setOnClickListener(new View.OnClickListener() {
+                    if (rotationDirection != 0) {
+                        if (rotationDirection == 1) {
+                            rotateRight90InGame();
+                        } else if (rotationDirection == -1) {
+                            rotateLeft90InGame();
+                        }
+                        rotation.setEventNeed(false);
+                        checkWinnerInGame();
+                    } else {
+                        Log.d("Rotation", "Rotation Direction == 0");
+                        Toast.makeText(GameActivity.this, "No direction Selected!!", Toast.LENGTH_SHORT).show();
+                    }
 
-            @Override
-            public void onClick(View v) {
+                }
+            });
+            ActivityLayout.addView(onRotationSensorButton); // 실제 xml 에 동적으로 추가
+        } else {
+            onRightRotationButton = new Button(this);
+            onRightRotationButton.setText("Right");
+            onLeftRotationButton = new Button(this);
+            onLeftRotationButton.setText("Left");
 
-                rotateRight90InGame(); // 90도 돌리고
-                checkWinnerInGame(); // 승자 검사하고
-
-
-            }
-        });
-
-
-
-        offRotationSensorButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-                rotateLeft90InGame(); // 90도 돌리고
-                checkWinnerInGame(); // 승자 검사하고
-            }
-        });
-
-        ActivityLayout.addView(onRotationSensorButton); // 실제 xml 에 동적으로 추가
-        ActivityLayout.addView(offRotationSensorButton);
+            onRightRotationButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    rotateRight90InGame();
+                    checkWinnerInGame();
+                }
+            });
+            onLeftRotationButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    rotateLeft90InGame();
+                    checkWinnerInGame();
+                }
+            });
+            ActivityLayout.addView(onRightRotationButton);
+            ActivityLayout.addView(onLeftRotationButton);
+        }
     }
 
     private void togglePlayer() { // 플레이어 변경
-        currentPlayer = (currentPlayer == 0) ? 1 : 0;
+        if (currentPlayer == 0) {
+            playertext.setText(playerName2 + "`s turn");
+            currentPlayer = 1;
+        } else {
+            playertext.setText(playerName1 + "`s turn");
+            currentPlayer = 0;
+        }
     }
 
     private void toggleButtonActive() { // 버튼 순서에 따른 안내문 검사를 위한 메서드
@@ -179,8 +236,8 @@ public class GameActivity extends AppCompatActivity {
 
         updateBoarState(selectedRow, selectedCol, currentPlayer); // boardState 업데이트
         adapter.placeStone(selectedRow, selectedCol, currentPlayer); // Adapter 업데이트
+        rotation.setEventNeed(true);
         addRotationButtons(); // 버튼 동적 추가
-        checkWinner();
 
     }
 
@@ -273,7 +330,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void removeRotationButtons() { // 동적으로 추가한 버튼 제거
         ActivityLayout.removeView(onRotationSensorButton);
-        ActivityLayout.removeView(offRotationSensorButton);
+        // ActivityLayout.removeView(offRotationSensorButton);
         Log.d("Debug", "removeButton() - Buttons removed from layout");
     }
 
@@ -327,28 +384,21 @@ public class GameActivity extends AppCompatActivity {
 
     private void alertWinner(int winnerPlayer) { // 승자 검출 메서드
 
-        String winnerColor;
+        String _winnerPlayer;
         if (winnerPlayer == 0) { // 만약 승자가 0이라면
-            winnerColor = "Black";
+            _winnerPlayer = playerName1;
         } else if (winnerPlayer == 1) {
-            winnerColor = "White"; // 만약 승자가 1이라면
+            _winnerPlayer = playerName2;
         } else {
             return;
         }
 
-        Toast.makeText(this, winnerColor + " is Winner!", Toast.LENGTH_SHORT).show(); // 승자 토스트 메서드 출력
-        Log.d("BoardState", winnerColor);
+        Toast.makeText(this, _winnerPlayer + " is Winner!", Toast.LENGTH_SHORT).show(); // 승자 토스트 메서드 출력
+        Log.d("BoardState", _winnerPlayer);
 
-        new Handler(Looper.myLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Intent intent = new Intent(GameActivity.this, MainActivity.class); // 해당 액티비티 종료
-                startActivity(intent);
-                finish();
-            }
-        }, 3000);
-
-
+        Intent intent = new Intent(this, LeaderboardActivity.class); // 해당 액티비티 종료
+        intent.putExtra("WINNER_NAME", _winnerPlayer);
+        startActivity(intent);
     }
 
 

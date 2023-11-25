@@ -10,36 +10,44 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Place Stone">
+
     </Button>
-    <!--
-        <Button
-            android:id="@+id/onRotationSensorButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="On Rotation">
+    <Switch
+        android:id="@+id/doRotation"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:text="Gyroscope"
+        android:checked="true" />
+    <TextView
+        android:id="@+id/playerTurn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=" ~ player turn"
+        android:layout_gravity="center"
+        android:textSize="18sp"
+        android:textColor="#000000"/>
 
-        </Button>
 
-        <Button
-            android:id="@+id/offRotationSensorButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Off Rotation">
+    <GridView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/gridView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:numColumns="6"
+        android:layout_gravity="center"
+        android:layout_margin="16dp"
+        android:horizontalSpacing="8dp"
+        android:verticalSpacing="8dp"
+        android:background="#F0F0F0"/>
 
-        </Button>
-        -->
+    <!--테스트용 : player 1이 이기게 하는 버튼-->
+    <Button
+        android:id="@+id/player1Win"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="player1Win">
+    </Button>
 
-
-        <GridView
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/gridView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:numColumns="6"
-            android:layout_gravity="center"
-            android:layout_margin="16dp"
-            android:horizontalSpacing="8dp"
-            android:verticalSpacing="8dp"
-            android:background="#F0F0F0"/>
-
-    </LinearLayout>
+</LinearLayout>

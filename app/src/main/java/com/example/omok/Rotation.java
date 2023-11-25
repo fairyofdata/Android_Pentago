@@ -9,7 +9,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class Rotation {
-    private static final float ROTATION_THRESHOLD = 1.0f;   // rotation 값의 임계점
+    private static final float ROTATION_THRESHOLD = 1.0f;   // rotation된 값의 임계점
 
     private Context context; // context 추가, for Toast msg.
 
@@ -22,8 +22,14 @@ public class Rotation {
     private int rotationDirection = 0; // default : 0
 
     public int getRotationDirection() {
-        return rotationDirection;
+        int n = rotationDirection;
+        getRotationDirectionRenewal();
+        return n;
     }   // to get rotation direction in GameActivity.java
+
+    private void getRotationDirectionRenewal() {
+        rotationDirection = 0;
+    }
 
     public Rotation(Context context) {
         this.context = context; // 생성자에서 context 초기화
@@ -40,39 +46,33 @@ public class Rotation {
             Log.d("Rotation", "Gyroscope sensor not supported!!");
         }
     }
-    
-    public void unregisterGyroscope() {     // gyroscope 센서 종료 선언 
+
+    public void unregisterGyroscope() {     // gyroscope 센서 종료 선언
         sensorManager.unregisterListener(gyroscopeEventListener);
     }
 
     public void setEventNeed(boolean eventNeed) {       // sensor 값을 받아올 것인가에 대한 설정
-        isEventNeed = eventNeed;    
-    } 
+        isEventNeed = eventNeed;
+    }
 
     private class RotatingSensorEventListener implements SensorEventListener {
 
         @Override
         public void onSensorChanged(SensorEvent event) {        // 실제 센서의 값을 return(float형식)
             if (!isEventNeed) {
-                Log.d("Rotation", "Gyroscope : 'isEventNeed' is false");
                 return;
             }
 
-            float x = event.values[0];
+            float x = event.values[2];
 
             if (Math.abs(x) > ROTATION_THRESHOLD) {
                 if (x > 0) {
-                    Toast.makeText(context, "Rotated to the right", Toast.LENGTH_SHORT).show();
                     rotationDirection = 1;
                     Log.d("Rotation", "Gyroscope : right, " + x);
                 } else {
-                    Toast.makeText(context, "Rotated to the left", Toast.LENGTH_SHORT).show();
                     rotationDirection = -1;
                     Log.d("Rotation", "Gyroscope : left, " + x);
                 }
-            } else {
-                rotationDirection = 0;
-                Log.d("Rotation", "Gyroscope : None");
             }
         }
 
