@@ -43,7 +43,7 @@ public class GameActivity extends AppCompatActivity {
 
     private Rotation rotation;      // Rotation.java 선언
     private int rotationDirection = 0; // Rotation 변수
-    private Switch doRotationSwitch;    // Rotation기능 쓸 것인지 선택하는 스위치
+    private Switch doRotation;    // Rotation기능 쓸 것인지 선택하는 스위치
     private boolean doRotationBool;
 
 
@@ -106,7 +106,7 @@ public class GameActivity extends AppCompatActivity {
             }
         });
         // Rotation 설정하는 switch
-        Switch doRotation = findViewById(R.id.doRotation);
+        doRotation = findViewById(R.id.doRotation);
 
 
         doRotation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -131,6 +131,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void addRotationButtons() { // 동적으로 버튼 추가하는 메서드
+        doRotation.setEnabled(false); // switch 비활성화
         if (doRotationBool) {
             onRotationSensorButton = new Button(this); // 버튼 생성
 
@@ -191,6 +192,7 @@ public class GameActivity extends AppCompatActivity {
             playertext.setText(playerName1 + "`s turn");
             currentPlayer = 0;
         }
+        doRotation.setEnabled(true);
     }
 
     private void toggleButtonActive() { // 버튼 순서에 따른 안내문 검사를 위한 메서드
