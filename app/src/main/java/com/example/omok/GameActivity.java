@@ -122,13 +122,13 @@ public class GameActivity extends AppCompatActivity {
 
 
         // for test, player1 wins.
-        Button player1Win = findViewById(R.id.player1Win);
-        player1Win.setOnClickListener(this::onClickWinnerIsPlayer1);
+        // Button player1Win = findViewById(R.id.player1Win);
+        // player1Win.setOnClickListener(this::onClickWinnerIsPlayer1);
 
     }
-    private void onClickWinnerIsPlayer1(View view) {
-        alertWinner(0);
-    }
+    // private void onClickWinnerIsPlayer1(View view) {
+    //    alertWinner(0);
+    //}
 
     private void addRotationButtons() { // 동적으로 버튼 추가하는 메서드
         doRotation.setEnabled(false); // switch 비활성화

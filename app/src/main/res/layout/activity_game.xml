@@ -42,12 +42,13 @@
         android:verticalSpacing="8dp"
         android:background="#F0F0F0"/>
 
-    <!--테스트용 : player 1이 이기게 하는 버튼-->
+    <!--테스트용 : player 1이 이기게 하는 버튼>
     <Button
         android:id="@+id/player1Win"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="player1Win">
     </Button>
+    <-->
 
 </LinearLayout>
