@@ -91,7 +91,8 @@ alertWinner() // 승자 있다면 승자 호출
 #### 3-3. togglePlayer() // 플레이어 변경
 #### 3-4. removeRotationButtons() // 추가한 2개 버튼 제거 
 
+## Demonstration video
+<img src="Pentago_Demonstration_Video.gif" width="720" height="1280"/>
+
 ## Version
-
-
 Android Studio Giraffe 2022.3.1
