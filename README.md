@@ -92,7 +92,8 @@ alertWinner() // 승자 있다면 승자 호출
 #### 3-4. removeRotationButtons() // 추가한 2개 버튼 제거 
 
 ## Demonstration video
-![Demonstration video](./Video/Pentago_Demonstration_Video.gif)
+
+<img src="./Video/Pentago_Demonstration_Video.gif" width="360" height="640"/>
 
 ## Version
 Android Studio Giraffe 2022.3.1
