@@ -19,7 +19,7 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:text="Gyroscope"
-        android:checked="true" />
+        android:checked="false" />
     <TextView
         android:id="@+id/playerTurn"
         android:layout_width="wrap_content"
